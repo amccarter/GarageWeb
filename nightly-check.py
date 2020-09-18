@@ -17,8 +17,8 @@ GPIO.setup(18, GPIO.IN, GPIO.PUD_UP) # set up pin ?? (one of the above listed pi
 
 # Your Account Sid and Auth Token from twilio.com/console
 # DANGER! This is insecure. See http://twil.io/secure
-account_sid = '***REMOVED***'
-auth_token = '***REMOVED***'
+account_sid = os.getenv('TWILIO_ACCOUNT_SID', '')
+auth_token = os.getenv('TWILIO_AUTH_TOKEN', '')
 
 if (GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH) or GPIO.input(18) == GPIO.LOW:
         logfile = open("/home/pi/GarageWeb/static/log.txt","a")
@@ -29,8 +29,17 @@ if (GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH) or GPIO.input(1
         message = client.messages \
                         .create(
                              body="The garage door is either open or cannot be detected. Go check it!",
-                             from_='***REMOVED***',
-                             to='***REMOVED***'
+                             from_=os.getenv('TWILIO_FROM_PHONE', ''),
+                             to_=os.getenv('TWILIO_TO_PHONE1', ''),
+                         )
+
+        print(message.sid)
+        
+        message = client.messages \
+                        .create(
+                             body="The garage door is either open or cannot be detected. Go check it!",
+                             from_=os.getenv('TWILIO_FROM_PHONE', ''),
+                             to_=os.getenv('TWILIO_TO_PHONE2', ''),
                          )
 
         print(message.sid)
