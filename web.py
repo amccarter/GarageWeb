@@ -1,4 +1,5 @@
 import time
+import timeit
 from datetime import datetime
 from flask import Flask, render_template, request
 
@@ -16,9 +17,6 @@ GPIO.output(13, GPIO.HIGH)
 GPIO.setup(15, GPIO.OUT)
 GPIO.output(15, GPIO.HIGH)
 
-
-
-
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
@@ -26,7 +24,7 @@ def index():
         if GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH:
              print("Garage is Opening/Closing")
              return app.send_static_file('Question.html')
-        else:  
+        else:
              if GPIO.input(16) == GPIO.LOW:
                    print ("Garage is Closed")
                    return app.send_static_file('Closed.html')
@@ -38,7 +36,7 @@ def index():
 @app.route('/Garage', methods=['GET', 'POST'])
 def Garage():
         name = request.form['garagecode']
-        if name == '12345678':  # 12345678 is the Password that Opens Garage Door (Code if Password is Correct)
+        if name == "12345678":  # 12345678 is the Password that Opens Garage Door (Code if Password is Correct)
                 GPIO.output(7, GPIO.LOW)
                 time.sleep(1)
                 GPIO.output(7, GPIO.HIGH)
@@ -55,7 +53,7 @@ def Garage():
                         print ("Garage is Open")
                         return app.send_static_file('Open.html')
 
-        if name != '12345678':  # 12345678 is the Password that Opens Garage Door (Code if Password is Incorrect)
+        if name != "12345678":  # 12345678 is the Password that Opens Garage Door (Code if Password is Incorrect)
                 if name == "":
                         name = "NULL"
                 print("Garage Code Entered: " + name)
@@ -76,7 +74,8 @@ def stylesheet():
 
 @app.route('/Log')
 def logfile():
-        return app.send_static_file('log.txt')
+        with open('log.txt', 'r') as f:
+            return render_template('Log.html', text=f.read().replace("\n", "<br />"))
 
 @app.route('/images/<picture>')
 def images(picture):
