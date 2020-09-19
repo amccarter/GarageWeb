@@ -74,8 +74,8 @@ def stylesheet():
 
 @app.route('/Log')
 def logfile():
-    with open('log.txt', 'r') as f:
-        return render_template('Log.html', text=f.read().replace("\n", "<br />"))
+    with open('static/log.txt', 'r') as f:
+        return render_template('log.html', text=f.read().replace("\n", "<br />"))
 
 @app.route('/images/<picture>')
 def images(picture):
