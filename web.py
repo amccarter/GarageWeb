@@ -75,7 +75,7 @@ def stylesheet():
 @app.route('/Log')
 def logfile():
     with open('/home/pi/GarageWeb/static/log.txt', 'r') as f:
-        return render_template('log.html', text=f.read().replace("\n", "<br />"))
+        return render_template('log.html', text=f.read())
 
 @app.route('/images/<picture>')
 def images(picture):
