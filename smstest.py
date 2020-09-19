@@ -12,19 +12,19 @@ to_phone_2 = os.environ['TWILIO_TO_PHONE2']
 client = Client(account_sid, auth_token)
 
 message = client.messages \
-                .create(
-                     body="[TEST] The garage door is either open or cannot be detected. Go check it!",
-                     from_=from_phone,
-                     to=to_phone_1
-                 )
+    .create(
+        body="[TEST] The garage door is either open or cannot be detected. Go check it!",
+        from_=from_phone,
+        to=to_phone_1
+    )
 
 print(message.sid)
 
 message = client.messages \
-                .create(
-                     body="[TEST] The garage door is either open or cannot be detected. Go check it!",
-                     from_=from_phone,
-                     to=to_phone_2
-                 )
+    .create(
+        body="[TEST] The garage door is either open or cannot be detected. Go check it!",
+        from_=from_phone,
+        to=to_phone_2
+    )
 
 print(message.sid)
