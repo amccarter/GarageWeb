@@ -15,10 +15,11 @@ GPIO.setwarnings(False)
 GPIO.setup(16, GPIO.IN, GPIO.PUD_UP) # set up pin ?? (one of the above listed pins) as an input with a pull-up resistor
 GPIO.setup(18, GPIO.IN, GPIO.PUD_UP) # set up pin ?? (one of the above listed pins) as an input with a pull-up resistor
 
-# Your Account Sid and Auth Token from twilio.com/console
-# DANGER! This is insecure. See http://twil.io/secure
-account_sid = os.getenv('TWILIO_ACCOUNT_SID', '')
-auth_token = os.getenv('TWILIO_AUTH_TOKEN', '')
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
+from_phone = os.environ['TWILIO_FROM_PHONE']
+to_phone_1 = os.environ['TWILIO_TO_PHONE1']
+to_phone_2 = os.environ['TWILIO_TO_PHONE2']
 
 if (GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH) or GPIO.input(18) == GPIO.LOW:
         logfile = open("/home/pi/GarageWeb/static/log.txt","a")
@@ -29,8 +30,8 @@ if (GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH) or GPIO.input(1
         message = client.messages \
                         .create(
                              body="The garage door is either open or cannot be detected. Go check it!",
-                             from_=os.getenv('TWILIO_FROM_PHONE', ''),
-                             to_=os.getenv('TWILIO_TO_PHONE1', ''),
+                             from_=from_phone,
+                             to=to_phone_1
                          )
 
         print(message.sid)
@@ -38,8 +39,8 @@ if (GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH) or GPIO.input(1
         message = client.messages \
                         .create(
                              body="The garage door is either open or cannot be detected. Go check it!",
-                             from_=os.getenv('TWILIO_FROM_PHONE', ''),
-                             to_=os.getenv('TWILIO_TO_PHONE2', ''),
+                             from_=from_phone,
+                             to=to_phone_2
                          )
 
         print(message.sid)
