@@ -1,7 +1,7 @@
 import time
 import timeit
 from datetime import datetime
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)  # the pin numbers refer to the board connector not the chip
@@ -31,6 +31,41 @@ def index():
         if GPIO.input(18) == GPIO.LOW:
             print ("Garage is Open")
             return app.send_static_file('Open.html')
+
+@app.route('/status')
+def status():
+    doorstatus = "unknown"
+    if GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH:
+        doorstatus = "unknown"
+    elif GPIO.input(16) == GPIO.LOW:
+        doorstatus = "closed"
+    elif GPIO.input(18) == GPIO.LOW:
+        doorstatus = "open"
+            
+    return jsonify(
+        status=doorstatus
+    )
+
+@app.route('/trigger', methods=['POST'])
+def trigger():
+    passcode = request.get_json()['passcode']
+    if passcode == "12345678":  # 12345678 is the Password that Opens Garage Door (Code if Password is Correct)
+        logfile = open("/home/pi/GarageWeb/static/log.txt","a")
+        logfile.write(datetime.now().strftime("%Y/%m/%d -- %H:%M:%S  -- Passcode entered, door Opening/Closing \n"))
+        logfile.close()
+        
+        GPIO.output(7, GPIO.LOW)
+        time.sleep(1)
+        GPIO.output(7, GPIO.HIGH)
+        time.sleep(2)
+
+    if passcode != "12345678":  # 12345678 is the Password that Opens Garage Door (Code if Password is Incorrect)
+        if passcode == "":
+            passcode = "NULL"
+        print("Incorrect garage Code Entered: " + passcode)
+        logfile = open("/home/pi/GarageWeb/static/log.txt","a")
+        logfile.write(datetime.now().strftime("%Y/%m/%d -- %H:%M:%S  -- Invalid passcode entered: " + passcode + " \n"))
+        logfile.close()
 
 
 @app.route('/Garage', methods=['GET', 'POST'])
