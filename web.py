@@ -2,6 +2,7 @@ import time
 import timeit
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
+import ssl
 
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)  # the pin numbers refer to the board connector not the chip
@@ -67,6 +68,12 @@ def trigger():
         logfile.write(datetime.now().strftime("%Y/%m/%d -- %H:%M:%S  -- Invalid passcode entered: " + passcode + " \n"))
         logfile.close()
 
+@app.route('/getlogs', methods=['GET'])
+def getlogs():
+    with open('/home/pi/GarageWeb/static/log.txt', 'r') as f:
+        return jsonify(
+            log = f.read()
+       )
 
 @app.route('/Garage', methods=['GET', 'POST'])
 def Garage():
@@ -116,5 +123,8 @@ def logfile():
 def images(picture):
     return app.send_static_file('images/' + picture)
 
+ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+ctx.load_cert_chain('cert.pem', 'key.pem')
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000, ssl_context=ctx)
