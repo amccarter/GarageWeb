@@ -124,7 +124,7 @@ def images(picture):
     return app.send_static_file('images/' + picture)
 
 ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-ctx.load_cert_chain('cert.pem', 'key.pem')
+ctx.load_cert_chain('/home/pi/GarageWeb/cert.pem', '/home/pi/GarageWeb/key.pem')
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5000, ssl_context=ctx)
