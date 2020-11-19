@@ -1,8 +1,18 @@
+import os
 import time
 import timeit
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 import ssl
+from twilio.rest import Client
+
+from dotenv import load_dotenv
+load_dotenv()
+
+account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+from_phone = os.getenv('TWILIO_FROM_PHONE')
+to_phone_1 = os.getenv('TWILIO_TO_PHONE1')
 
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)  # the pin numbers refer to the board connector not the chip
@@ -109,6 +119,36 @@ def Garage():
             if GPIO.input(18) == GPIO.LOW:
                 print ("Garage is Open")
                 return app.send_static_file('Open.html')
+
+@app.route('/receivesms', methods=['POST'])
+def receivesms():
+    sid = request.form.get('AccountSid')
+    smsbody = request.form.get('Body')
+
+    if sid != account_sid:
+        sid  = 'NULL'
+        response = jsonify({'message': 'Access denied'})
+
+        return response, 401
+    try:
+        client = Client(account_sid, auth_token)
+
+        message = client.messages \
+        .create(
+            body=smsbody,
+            from_=from_phone,
+            to=to_phone_1
+        )
+
+        print(message.sid)
+
+        msgresponse = '<?xml version="1.0" encoding="UTF-8"?><Response></Response>'
+
+        return msgresponse, 200
+
+    except Exception as e:
+        response = jsonify({'message': str(e)})
+        return response, 500
 
 @app.route('/stylesheet.css')
 def stylesheet():
